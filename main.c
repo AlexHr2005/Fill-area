@@ -7,6 +7,10 @@ struct pixel {
     unsigned char B;
 };
 
+float calculate_avarage_intensity(struct pixel p) {
+    return ((float) p.R + (float) p.G + (float) p.B) / 3;
+}
+
 struct pixel** read_file(FILE *fptr, char* fileName, int* rows, int* columns) {
     fptr = fopen(fileName, "r");
 
@@ -24,7 +28,6 @@ struct pixel** read_file(FILE *fptr, char* fileName, int* rows, int* columns) {
         picture[i] = (struct pixel*) malloc (*columns * sizeof(struct pixel));
     }
 
-    char a;
     for(int r = 0; r < *rows; r++) {
         for(int c = 0; c < *columns; c++) {
             fscanf(fptr, "%d", &picture[r][c].R);
@@ -40,19 +43,111 @@ struct pixel** read_file(FILE *fptr, char* fileName, int* rows, int* columns) {
     return picture;
 }
 
+void fill_area(struct pixel** picture, int rows, int columns, int row_to_fill, int column_to_fill) {
+    fill_horizontally(picture, columns, row_to_fill, column_to_fill);
+    fill_vertically(picture, rows, row_to_fill, column_to_fill);
+
+    picture[row_to_fill][column_to_fill].R = 0;
+    picture[row_to_fill][column_to_fill].G = 0;
+    picture[row_to_fill][column_to_fill].B = 0;
+}
+
+void fill_horizontally(struct pixel** picture, int columns, int row_to_fill, int column_to_fill) {
+    int row[columns];
+    for(int i = 0; i < columns; i++){
+        row[i] = 0;
+    }
+
+    struct pixel current = picture[row_to_fill][column_to_fill];
+    float curr_avarage_intensity;
+    float prev_avarage_intensity = calculate_avarage_intensity(current);
+
+    for(int c = column_to_fill + 1; c < columns; c++) {
+        current = picture[row_to_fill][c];
+        curr_avarage_intensity = calculate_avarage_intensity(current);
+
+        if(curr_avarage_intensity - prev_avarage_intensity >= -1.00 && curr_avarage_intensity - prev_avarage_intensity <= 1.00) {
+            row[c] = 1;
+            prev_avarage_intensity = curr_avarage_intensity;
+        }
+        else break;
+    }
+
+    for(int c = column_to_fill - 1; c >= 0; c--) {
+        current = picture[row_to_fill][c];
+        curr_avarage_intensity = calculate_avarage_intensity(current);
+        if(curr_avarage_intensity - prev_avarage_intensity >= -1.00 && curr_avarage_intensity - prev_avarage_intensity <= 1.00) {
+            row[c] = 1;
+            prev_avarage_intensity = curr_avarage_intensity;
+        }
+        else break;
+    }
+
+    for(int i = 0; i < columns; i++) {
+        if(row[i] == 1){
+            picture[row_to_fill][i].R = 0;
+            picture[row_to_fill][i].G = 0;
+            picture[row_to_fill][i].B = 0;
+        }
+    }
+}
+
+void fill_vertically(struct pixel** picture, int rows, int row_to_fill, int column_to_fill) {
+    int column[rows];
+    for(int i = 0; i < rows; i++) {
+        column[i] = 0;
+    }
+
+    struct pixel current = picture[row_to_fill][column_to_fill];
+    float curr_avarage_intensity;
+    float prev_avarage_intensity = calculate_avarage_intensity(current);
+
+    for(int r = row_to_fill + 1; r < rows; r++) {
+        current = picture[r][column_to_fill];
+        curr_avarage_intensity = calculate_avarage_intensity(current);
+
+        if(curr_avarage_intensity - prev_avarage_intensity >= -1.00 && curr_avarage_intensity - prev_avarage_intensity <= 1.00) {
+            column[r] = 1;
+            prev_avarage_intensity = curr_avarage_intensity;
+        }
+        else break;
+    }
+
+    for(int r = row_to_fill + -1; r >= 0; r--) {
+        current = picture[r][column_to_fill];
+        curr_avarage_intensity = calculate_avarage_intensity(current);
+
+        if(curr_avarage_intensity - prev_avarage_intensity >= -1.00 && curr_avarage_intensity - prev_avarage_intensity <= 1.00) {
+            column[r] = 1;
+            prev_avarage_intensity = curr_avarage_intensity;
+        }
+        else break;
+    }
+
+    for(int i = 0; i < rows; i++) {
+        if(column[i] == 1){
+            picture[i][column_to_fill].R = 0;
+            picture[i][column_to_fill].G = 0;
+            picture[i][column_to_fill].B = 0;
+        }
+    }
+}
+
 int main()
 {
     FILE *fptr;
     char fileName[20];
     int rows, columns;
-    int row_to_write, column_to_write;
+    int row_to_fill, column_to_fill;
 
     printf("Welcome to Fill Area! (basically Paint)\n");
     printf("\nName of the file: ");
     scanf("%s", fileName);
 
     struct pixel** picture = read_file(fptr, fileName, &rows, &columns);
-    printf("%d %d\n", rows, columns);
+    if(picture == NULL) {
+        return -1;
+    }
 
     for(int r = 0; r < rows; r++) {
         for(int c = 0; c < columns; c++) {
@@ -61,9 +156,26 @@ int main()
         printf("\n");
     }
 
-    /*printf("Coordinates - '[row] [column]': ");
-    scanf("%d %d", &row_to_write, &column_to_write);
-    printf("%d %d", row_to_write, column_to_write);*/
+    printf("Coordinates - '[row] [column]': ");
+    scanf("%d %d", &row_to_fill, &column_to_fill);
+
+    while(row_to_fill >= rows || column_to_fill >= columns) {
+        printf("\nInvalid coordinates (row/column). Try again\n");
+        printf("Coordinates - '[row] [column]': ");
+        scanf("%d %d", &row_to_fill, &column_to_fill);
+    }
+
+    fill_area(picture, rows, columns, row_to_fill, column_to_fill);
+
+    printf("\n");
+    for(int r = 0; r < rows; r++) {
+        for(int c = 0; c < columns; c++) {
+            printf("%d:%d:%d ", picture[r][c].R, picture[r][c].G, picture[r][c].B);
+        }
+        printf("\n");
+    }
+
+    free(picture);
 
     return 0;
 }
