@@ -60,15 +60,14 @@ void fill_horizontally(struct pixel** picture, int columns, int row_to_fill, int
 
     struct pixel current = picture[row_to_fill][column_to_fill];
     float curr_avarage_intensity;
-    float prev_avarage_intensity = calculate_avarage_intensity(current);
+    float start_avarage_intensity = calculate_avarage_intensity(current);
 
     for(int c = column_to_fill + 1; c < columns; c++) {
         current = picture[row_to_fill][c];
         curr_avarage_intensity = calculate_avarage_intensity(current);
 
-        if(curr_avarage_intensity - prev_avarage_intensity >= -1.00 && curr_avarage_intensity - prev_avarage_intensity <= 1.00) {
+        if(curr_avarage_intensity - start_avarage_intensity >= -1.00 && curr_avarage_intensity - start_avarage_intensity <= 1.00) {
             row[c] = 1;
-            prev_avarage_intensity = curr_avarage_intensity;
         }
         else break;
     }
@@ -76,9 +75,8 @@ void fill_horizontally(struct pixel** picture, int columns, int row_to_fill, int
     for(int c = column_to_fill - 1; c >= 0; c--) {
         current = picture[row_to_fill][c];
         curr_avarage_intensity = calculate_avarage_intensity(current);
-        if(curr_avarage_intensity - prev_avarage_intensity >= -1.00 && curr_avarage_intensity - prev_avarage_intensity <= 1.00) {
+        if(curr_avarage_intensity - start_avarage_intensity >= -1.00 && curr_avarage_intensity - start_avarage_intensity <= 1.00) {
             row[c] = 1;
-            prev_avarage_intensity = curr_avarage_intensity;
         }
         else break;
     }
@@ -100,15 +98,14 @@ void fill_vertically(struct pixel** picture, int rows, int row_to_fill, int colu
 
     struct pixel current = picture[row_to_fill][column_to_fill];
     float curr_avarage_intensity;
-    float prev_avarage_intensity = calculate_avarage_intensity(current);
+    float start_avarage_intensity = calculate_avarage_intensity(current);
 
     for(int r = row_to_fill + 1; r < rows; r++) {
         current = picture[r][column_to_fill];
         curr_avarage_intensity = calculate_avarage_intensity(current);
 
-        if(curr_avarage_intensity - prev_avarage_intensity >= -1.00 && curr_avarage_intensity - prev_avarage_intensity <= 1.00) {
+        if(curr_avarage_intensity - start_avarage_intensity >= -1.00 && curr_avarage_intensity - start_avarage_intensity <= 1.00) {
             column[r] = 1;
-            prev_avarage_intensity = curr_avarage_intensity;
         }
         else break;
     }
@@ -117,9 +114,8 @@ void fill_vertically(struct pixel** picture, int rows, int row_to_fill, int colu
         current = picture[r][column_to_fill];
         curr_avarage_intensity = calculate_avarage_intensity(current);
 
-        if(curr_avarage_intensity - prev_avarage_intensity >= -1.00 && curr_avarage_intensity - prev_avarage_intensity <= 1.00) {
+        if(curr_avarage_intensity - start_avarage_intensity >= -1.00 && curr_avarage_intensity - start_avarage_intensity <= 1.00) {
             column[r] = 1;
-            prev_avarage_intensity = curr_avarage_intensity;
         }
         else break;
     }
