@@ -43,6 +43,29 @@ struct pixel** read_file(FILE *fptr, char* fileName, int* rows, int* columns) {
     return picture;
 }
 
+void write_to_file(FILE *fptr, char* fileName, struct pixel** picture, int rows, int columns) {
+    fptr = fopen(fileName, "w");
+
+    fprintf(fptr, "%d ", columns);
+    fprintf(fptr, "%d\n", rows);
+
+    for(int r = 0; r < rows; r++) {
+        for(int c = 0; c < columns; c++) {
+            fprintf(fptr, "%d:%d:%d", picture[r][c].R, picture[r][c].G, picture[r][c].B);
+            if(c + 1 != columns) {
+                fprintf(fptr, " ");
+            }
+            else {
+                if(r + 1 != rows) {
+                    fprintf(fptr, "\n");
+                }
+            }
+        }
+    }
+
+    fclose(fptr);
+}
+
 void fill_area(struct pixel** picture, int rows, int columns, int row_to_fill, int column_to_fill) {
     fill_horizontally(picture, columns, row_to_fill, column_to_fill);
     fill_vertically(picture, rows, row_to_fill, column_to_fill);
@@ -170,6 +193,8 @@ int main()
         }
         printf("\n");
     }
+
+    write_to_file(fptr, fileName, picture, rows, columns);
 
     free(picture);
 
