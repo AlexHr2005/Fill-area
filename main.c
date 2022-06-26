@@ -21,6 +21,7 @@ int main()
         return -1;
     }
 
+    printf("\n");
     for(int r = 0; r < rows; r++) {
         for(int c = 0; c < columns; c++) {
             printf("%d:%d:%d ", picture[r][c].R, picture[r][c].G, picture[r][c].B);
@@ -28,7 +29,7 @@ int main()
         printf("\n");
     }
 
-    printf("Coordinates - '[row] [column]': ");
+    printf("\nCoordinates - '[row] [column]': ");
     scanf("%d %d", &row_to_fill, &column_to_fill);
 
     while(row_to_fill >= rows || column_to_fill >= columns) {
@@ -49,6 +50,9 @@ int main()
 
     write_to_file(fptr, fileName, picture, rows, columns);
 
+    for(int i = 0; i < rows; i++){
+        free(picture[i]);
+    }
     free(picture);
 
     return 0;
